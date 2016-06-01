@@ -1,53 +1,55 @@
 package entityPac;
 
+import configPac.Config;
+
 public class Entity {
 	int hp;
 	int maxHp;
 	int attackPower;
 	int row;
 	int col;
+	char icon;
+	public Entity(){
+		this.icon = '.';
+	}
 	
-	void inputCommand(){
+	public void inputCommand(){
 		//명령 입력을 받는 함수
 	}
-	void setRow(){
-		//Entity의 WorldMap에서의 좌표 저장
+	public void setRow(int row){
+		this.row = row;
 	}
-	void setCol(){
-		//Entity의 WorldMap에서의 좌표 저장
+	public void setCol(int col){
+		this.col = col;
 	}
-	int getRow(){
-		//Entity WorldMap에서의 좌표 반환
+	public int getRow(){
 		return row;
 	}
-	int getCol(){
-		//Entity WorldMap에서의 좌표 반환
+	public int getCol(){
 		return col;
 	}
-	int getHP(){
+	public int getHP(){
 		return hp;
 	}
-	int getAttackPower(){
+	public int getMaxHP(){
+		return maxHp;
+	}
+	public int getAttackPower(){
 		return attackPower;
 	}
-	void increaseHP(){
-		//체력 증가
+	void increaseHP(int i){
+		hp+=i;
 	}
-	void decreaseHP(){
-		//체력감소
+	void decreaseHP(int i){
+		hp-=i;
 	}
-	void getIcon(){
-		//객체의 아이콘 반환
+	public char getIcon(){
+		return icon;
 	}
 	void showMenu(){
 		//객체의 선택 메뉴 출력
 	}
 	
-	boolean getEnd(){
-		if (true)
-			return true;
-		else
-			return false;
-	}
+
 	
 }
