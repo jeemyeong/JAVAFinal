@@ -1,6 +1,6 @@
 package entityPac;
 
-import configPac.Config;
+import worldMapPac.WorldMap;
 
 public class Entity {
 	int hp;
@@ -9,12 +9,11 @@ public class Entity {
 	int row;
 	int col;
 	char icon;
+	WorldMap map;
 	public Entity(){
-		this.icon = '.';
 	}
 	
 	public void inputCommand(){
-		//명령 입력을 받는 함수
 	}
 	public void setRow(int row){
 		this.row = row;
@@ -38,16 +37,25 @@ public class Entity {
 		return attackPower;
 	}
 	void increaseHP(int i){
-		hp+=i;
+		if(hp+i>getMaxHP()) hp=getMaxHP();
+		else hp+=i;
+	}
+	void increaseMaxHP(int i){
+		maxHp+=i;
 	}
 	void decreaseHP(int i){
 		hp-=i;
+	}
+	void increaseAttackPower(int i){
+		attackPower+=i;
+	}
+	void decreaseAttackPower(int i){
+		attackPower-=i;
 	}
 	public char getIcon(){
 		return icon;
 	}
 	void showMenu(){
-		//객체의 선택 메뉴 출력
 	}
 	
 

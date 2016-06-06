@@ -5,40 +5,53 @@ import entityPac.*;
 
 public class WorldMap {
 	
-	Entity[][] arrayMap = new Entity[Config.mapRow][Config.mapCol];
-	Player player;
+	public Entity[][] arrayMap;
+	public Player player;
+	public Teleport[] teleport = new Teleport[2];
+	boolean light = true;
 	boolean end = false;
+	boolean hasKey = false;
 	
 	void insertEntity(char type, int i, int j){
-		//Entity를 map에 삽입
 		switch (type){
-			case '#' : arrayMap[i][j] = new Wall(i,j); break;
-			case 'F' : arrayMap[i][j] = new Food(i,j); break;
-			case 'M' : arrayMap[i][j] = new Monster(i,j); break;
-			case 'R' : arrayMap[i][j] = new Rock(i,j); break;
-			case 'W' : arrayMap[i][j] = new Weapon(i,j); break;
-			case '@' : arrayMap[i][j] = new Player(i,j); 
+			case '#' : arrayMap[i][j] = new Wall(i,j, this); break;
+			case 'F' : arrayMap[i][j] = new Food(i,j, this); break;
+			case 'M' : arrayMap[i][j] = new Monster(i,j, this); break;
+			case 'm' : arrayMap[i][j] = new SMonster(i,j, this); break;
+			case 'R' : arrayMap[i][j] = new Rock(i,j, this); break;
+			case 'T' : arrayMap[i][j] = new Teleport(i,j, this);
+					if(teleport[0]==null) teleport[0]=(Teleport) arrayMap[i][j];
+					else teleport[1]=(Teleport) arrayMap[i][j];
+					break;
+			case 'W' : arrayMap[i][j] = new Weapon(i,j, this); break;
+			case 'B' : arrayMap[i][j] = new Box(i,j, this); break;
+			case 'K' : arrayMap[i][j] = new Key(i,j, this); break;
+			case 'D' : arrayMap[i][j] = new Door(i,j, this); break;
+			case '@' : arrayMap[i][j] = new Player(i,j, this); 
 					   player=(Player) arrayMap[i][j]; break;
 		}
 	}
 	
 	void deleteEntity(int x, int y){
-		//Entity를 Map에서 삭제
 		arrayMap[y][x] = null;
 	}
 	public void initialize(char[][] map){
-		//char[][] 배열 데이터에 따라 Entity들을 map에 삽입하여 배치
-		for(int i=0;i<map.length;i++){
+		arrayMap = new Entity[Config.mapRow][Config.mapCol];
+		for(int i=0;i<map.length;i++)
 			for(int j=0;j<map[i].length;j++)
 				insertEntity(map[i][j], i, j);
-			}
 	}
 	
 	void showMap(){
-		//지도를 화면에 출력
-		for(int i=0;i<arrayMap.length;i++){
-			for(int j=0;j<arrayMap[i].length;j++){
-				if (arrayMap[i][j] != null)
+		int xView = player.getCol();
+		int yView = player.getRow();
+		if(xView<3) xView=3;
+		if(yView<3) yView=3;
+		for(int i=yView-3;i<yView+4;i++){
+			for(int j=xView-3;j<xView+4;j++){
+				if (!light)
+					System.out.print('-');
+				else if (arrayMap[i][j] != null)
 					System.out.print(arrayMap[i][j].getIcon());
 				else
 					System.out.print('.');
@@ -48,57 +61,38 @@ public class WorldMap {
 	}
 	
 	public void moveEntity(int x, int y, int nx, int ny){
-		//Entity를 map에서 이동시킴
 		if (arrayMap[ny][nx] == null){
 			arrayMap[ny][nx] = arrayMap[y][x];
 			arrayMap[y][x] = null;
 		}
 	}
+	public void turnLight(){
+		light = !light;
+	}
+	public boolean getLight(){
+		return light;
+	}
 	void showMenu(){
-		System.out.println(Config.player + player.getHP()+"/"+player.getMaxHP()+ Config.damage + player.getAttackPower() + "\n" +
-						   Config.bareHands + "\n" + 
+		System.out.println(Config.playerHP + player.getHP()+"/"+player.getMaxHP()+ Config.damage + player.getAttackPower() + "\n" +
+						   Config.playerLv+player.Lv()+Config.playerExp+player.Exp()+"/"+player.maxExp()+player.getWeapon() + "\n" + 
 						   Config.x+player.getCol()+Config.y+player.getRow());
 		System.out.print(Config.mainMenu);
 	}
-	
-	boolean getEnd(){
-		//not yet
-		if (end)
-			return true;
-		else
-			return false;
+	public void getKey(){
+		hasKey = true;
 	}
-	public void movePlayer(){
-		String cmd = Config.scan.nextLine();
-		int y = player.getRow();
-		int x = player.getCol();
-		int ny = y;
-		int nx = x;
-		switch(cmd){
-			case "W": case "w": ny-=1; break;
-			case "A": case "a": nx-=1; break;
-			case "S": case "s": ny+=1; break;
-			case "D": case "d": nx+=1; break;
-		}
-		if(arrayMap[ny][nx] == null){
-			moveEntity(x,y,nx,ny);
-			player.setRow(ny);
-			player.setCol(nx);
-		}
-		else if(arrayMap[ny][nx].getIcon()=='M')
-			arrayMap[ny][nx].inputCommand();
-		else{
-			arrayMap[ny][nx].inputCommand();
-		}
-//		else if(arrayMap[ny][nx].getIcon() == '#'){
-//			System.out.println("You can't go through wall");
-//		}
+	public boolean hasKey(){
+		return hasKey;
+	}
+	public void getEnd(){
+		end = true;
 	}
 	public void run() {
-		while(!getEnd()){
+		while(!end){
+			System.out.println();
 			showMap();
 			showMenu();
-			movePlayer();
+			player.inputCommand(Config.scan.nextLine());
 		}
 	}
 	
